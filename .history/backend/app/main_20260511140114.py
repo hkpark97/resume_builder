@@ -6,7 +6,7 @@ app.add_middleware(CORSMiddleware,
                    allow_origins=[
                        "http://127.0.0.1:5173", 
                        "http://localhost:5173",
-                       "https://resume-builder-cm1wpzzuz-kate-parks-projects-f882814e.vercel.app"
+                       "https://resume-builder-dlghzigf9-kate-parks-projects-f882814e.vercel.app"
                        ], 
                    allow_credentials=True, 
                    allow_methods=["*"], 
