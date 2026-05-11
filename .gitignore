@@ -1,0 +1,9 @@
+.env
+backend/.env
+frontend/.env
+backend/.env
+frontend/.env
+.history/
+backend/.env
+frontend/.env
+*.env
