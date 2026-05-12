@@ -40,7 +40,6 @@ function App() {
   const [changeNewPassword, setChangeNewPassword] = useState("");
 
   const [authConfirmPassword, setAuthConfirmPassword] = useState("");
-  const [resetConfirmPassword, setResetConfirmPassword] = useState("");
   const [changeConfirmPassword, setChangeConfirmPassword] = useState("");
 
   const [feedback, setFeedback] = useState({
@@ -254,11 +253,6 @@ function App() {
 
     if (!password) {
       setError("Please enter your password.");
-      return;
-    }
-
-    if (password !== resetConfirmPassword.trim()) {
-      setError("Passwords do not match.");
       return;
     }
 
@@ -717,13 +711,6 @@ function App() {
                 placeholder="Your email"
                 value={resetEmail}
                 onChange={(e) => setResetEmail(e.target.value)}
-              />
-
-              <input
-                type="password"
-                placeholder="Confirm new password"
-                value={resetConfirmPassword}
-                onChange={(e) => setResetConfirmPassword(e.target.value)}
               />
 
               <button className="primary">Send reset link</button>
