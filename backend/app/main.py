@@ -7,7 +7,7 @@ app.add_middleware(
     allow_origins=[
         "http://127.0.0.1:5173", 
         "http://localhost:5173",
-        "https://resume-builder-ten-kappa-52.vercel.app"
+        "https://www.getresumagic.app"
         ], 
     allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True, 

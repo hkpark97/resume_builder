@@ -6,6 +6,27 @@ from openai import OpenAI
 
 from app.config import settings
 
+COMMON_SKILLS = [
+    "python",
+    "fastapi",
+    "react",
+    "javascript",
+    "typescript",
+    "sql",
+    "postgresql",
+    "aws",
+    "docker",
+    "kubernetes",
+    "linux",
+    "git",
+    "rest api",
+    "api",
+    "machine learning",
+    "openai",
+    "jwt",
+    "sqlalchemy",
+]
+
 
 def _client() -> OpenAI:
     if not settings.openai_api_key:
@@ -13,6 +34,7 @@ def _client() -> OpenAI:
             status_code=400,
             detail="OPENAI_API_KEY is missing. Add it to backend/.env before analysis.",
         )
+
     return OpenAI(api_key=settings.openai_api_key)
 
 
@@ -25,6 +47,7 @@ def _extract_json(text: str) -> dict:
         pass
 
     match = re.search(r"\{.*\}", text, flags=re.DOTALL)
+
     if match:
         try:
             return json.loads(match.group(0))
@@ -41,6 +64,23 @@ def _extract_json(text: str) -> dict:
         "recommendation": "tailor first",
         "report_markdown": text,
     }
+
+
+def extract_terms(text: str) -> list[str]:
+    text_lower = text.lower()
+
+    return [skill for skill in COMMON_SKILLS if skill in text_lower]
+
+
+def overlap_score(resume_terms: list[str], job_terms: list[str]) -> float:
+    if not job_terms:
+        return 0.0
+
+    resume_set = set(resume_terms)
+    job_set = set(job_terms)
+    matched = resume_set & job_set
+
+    return round(len(matched) / len(job_set) * 100, 1)
 
 
 def _mock_analysis() -> dict:
@@ -119,7 +159,11 @@ def analyze_resume_job(
 ) -> dict:
     if settings.use_mock_ai:
         return _mock_analysis()
-    
+
+    resume_terms = extract_terms(resume_text)
+    job_terms = extract_terms(job_description)
+    skills_overlap = overlap_score(resume_terms, job_terms)
+
     prompt = f"""
 You are an expert resume consultant. Analyze the resume against the job posting.
 
@@ -129,6 +173,8 @@ Rules:
 - Output valid JSON only.
 - Be conservative. Do not give a high score just because the resume sounds generally strong.
 - Apply the same scoring rubric consistently every time.
+- Use the deterministic scoring signal as an important input, but still consider experience, tools, seniority, and domain relevance.
+- If the skills overlap score is low, the final_score should usually be lower unless there is strong evidence from experience.
 
 Scoring rubric:
 - 90-100: Excellent match. Resume strongly matches required skills, experience, tools, and domain.
@@ -136,6 +182,11 @@ Scoring rubric:
 - 60-74: Moderate match. Some relevant experience, several missing requirements.
 - 40-59: Weak match. Limited overlap with job requirements.
 - 0-39: Poor match. Resume does not align with the role.
+
+Deterministic scoring signal:
+- Resume matched terms: {resume_terms}
+- Job required terms detected: {job_terms}
+- Skills overlap score: {skills_overlap}
 
 Job title: {job_title}
 Company: {company}
@@ -187,5 +238,12 @@ Return JSON exactly:
 
     data = _extract_json(res.choices[0].message.content)
     data["final_score"] = float(data.get("final_score") or 0)
+
+    if "breakdown" not in data or not isinstance(data["breakdown"], dict):
+        data["breakdown"] = {}
+
+    data["breakdown"]["skills_overlap_signal"] = skills_overlap
+    data["matched_terms"] = resume_terms
+    data["job_terms_detected"] = job_terms
 
     return data
