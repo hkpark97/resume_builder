@@ -497,10 +497,6 @@ function App() {
                 and resume advice. No account required for first analysis.
               </p>
             </div>
-
-            <aside>
-              Login only when you want to save history and feedback.
-            </aside>
           </section>
 
           <main className="container">
@@ -514,20 +510,6 @@ function App() {
                     type="file"
                     accept=".pdf,.docx,.txt,.md"
                     onChange={(e) => setResumeFile(e.target.files?.[0] || null)}
-                  />
-
-                  <label>Job title</label>
-                  <input
-                    value={jobTitle}
-                    onChange={(e) => setJobTitle(e.target.value)}
-                    placeholder="Backend Developer"
-                  />
-
-                  <label>Company</label>
-                  <input
-                    value={company}
-                    onChange={(e) => setCompany(e.target.value)}
-                    placeholder="Company"
                   />
                 </div>
 
@@ -557,6 +539,13 @@ function App() {
                   <small>Match Score</small>
                   <strong>{analysis.final_score}%</strong>
                   <p>{analysis.summary}</p>
+
+                  {!loggedIn && (
+                    <p className="saveHint">
+                      Create an account or login to save this analysis to your
+                      dashboard.
+                    </p>
+                  )}
 
                   <button className="primary" onClick={saveAnalysis}>
                     {loggedIn ? "Save result" : "Login to save"}

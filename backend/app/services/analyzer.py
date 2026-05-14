@@ -63,6 +63,7 @@ def clean_job_posting_text(text: str) -> str:
         "create alert",
         "job alert",
         "back to jobs",
+        "about our team"
     ]
 
     lines = text.splitlines()

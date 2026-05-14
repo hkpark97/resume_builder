@@ -390,6 +390,16 @@ textarea:focus {
   animation: spin 0.8s linear infinite;
 }
 
+.saveHint {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #f8fafc;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
